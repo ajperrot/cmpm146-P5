@@ -102,7 +102,7 @@ def graph(state):
 
 def heuristic(state):
     # Implement your heuristic here!
-    if state['iron_axe'] > 1 or state['iron_pickaxe'] > 1 or state['stone_axe'] > 1 or state['stone_pickaxe'] > 1 or state['wooden_axe'] > 1 or state['wooden_pickaxe'] > 1:
+    if state['bench'] > 1 or state['iron_axe'] > 1 or state['iron_pickaxe'] > 1 or state['stone_axe'] > 1 or state['stone_pickaxe'] > 1 or state['wooden_axe'] > 1 or state['wooden_pickaxe'] > 1:
     #avoid making unnecessary tools
     #this was just the example given in the assignement
         return inf
@@ -116,17 +116,18 @@ def search(graph, state, is_goal, limit, heuristic):
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
-    while time() - start_time < limit:
-        #normal A* structures
-        path = []
-        queue = [(0, state)]
-        #pair: (previous state, action taken from that state)
-        prev_pairs = {}
-        prev_pairs[state] = None
-        #total recipe time + number of steps
-        costs = {}
-        costs[state] = 0
 
+    #normal A* structures
+    path = []
+    queue = [(0, state)]
+    #pair: (previous state, action taken from that state)
+    prev_pairs = {}
+    prev_pairs[state] = None
+    #total recipe time + number of steps
+    costs = {}
+    costs[state] = 0
+    
+    while time() - start_time < limit:
         current_cost, current_state = heappop(queue)
         if is_goal(current_state):
             #fill path with (state, action to that state) pairs
@@ -183,7 +184,7 @@ if __name__ == '__main__':
     state.update(Crafting['Initial'])
 
     # Search for a solution
-    resulting_plan = search(graph, state, is_goal, 5, heuristic)
+    resulting_plan = search(graph, state, is_goal, 10, heuristic)
 
     if resulting_plan:
         # Print resulting plan
