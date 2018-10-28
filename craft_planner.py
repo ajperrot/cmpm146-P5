@@ -102,7 +102,7 @@ def graph(state):
 
 def heuristic(state):
     # Implement your heuristic here!
-    if state['bench'] > 1 or state['iron_axe'] > 1 or state['iron_pickaxe'] > 1 or state['stone_axe'] > 1 or state['stone_pickaxe'] > 1 or state['wooden_axe'] > 1 or state['wooden_pickaxe'] > 1:
+    if state['bench'] > 1 or state['wooden_axe'] > 1 or state['wooden_pickaxe'] > 1 or state['stone_axe'] > 1 or state['stone_pickaxe'] > 1 or state['iron_axe'] > 1 or state['iron_pickaxe'] > 1:
     #avoid making unnecessary tools
     #this was just the example given in the assignement
         return inf
