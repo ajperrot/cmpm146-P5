@@ -1,6 +1,7 @@
 import json
 from collections import namedtuple, defaultdict, OrderedDict
 from timeit import default_timer as time
+from math import inf
 
 Recipe = namedtuple('Recipe', ['name', 'check', 'effect', 'cost'])
 
@@ -41,6 +42,12 @@ def make_checker(rule):
     def check(state):
         # This code is called by graph(state) and runs millions of times.
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
+        for requirement in rule['Requires']:
+            if not state[requirement]:
+                return False
+        for consumable in rule['Consumes']:
+            if not state[consumable] == rule['Consumes'][consumable]:
+                return False
         return True
 
     return check
@@ -48,13 +55,17 @@ def make_checker(rule):
 
 def make_effector(rule):
     # Implement a function that returns a function which transitions from state to
-    # new_state given the rule. This code runs once, when the rules are constructed
+    # next_state given the rule. This code runs once, when the rules are constructed
     # before the search is attempted.
 
     def effect(state):
         # This code is called by graph(state) and runs millions of times
         # Tip: Do something with rule['Produces'] and rule['Consumes'].
-        next_state = None
+        for consumable in rule['Consumes']:
+            state[consumable] -= rule['Consumes'][consumable]
+        for product in rule['produces']:
+            state[product] += rule['produces'][product]
+        next_state = state
         return next_state
 
     return effect
@@ -66,7 +77,10 @@ def make_goal_checker(goal):
 
     def is_goal(state):
         # This code is used in the search process and may be called millions of times.
-        return False
+        for condition in goal:
+            if not state[condition] == goal[condition]:
+                return False
+        return True
 
     return is_goal
 
@@ -92,13 +106,16 @@ def search(graph, state, is_goal, limit, heuristic):
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
+
+    path = []
+
     while time() - start_time < limit:
         pass
 
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
-    return None
+    return path
 
 if __name__ == '__main__':
     with open('Crafting.json') as f:
