@@ -48,9 +48,9 @@ def make_checker(rule):
             for requirement in rule['Requires']:
                 if not state[requirement]:
                     return False
-        if 'Consumes' in rule:
-            for consumable in rule['Consumes']:
-                if not state[consumable] >= rule['Consumes'][consumable]:
+        if 'Produces' in rule:
+            for product in rule['Produces']:
+                if not state[product] >= rule['Produces'][product]:
                     return False
         return True
 
@@ -68,10 +68,10 @@ def make_effector(rule):
         next_state = state.copy()
         if 'Consumes' in rule:
             for consumable in rule['Consumes']:
-                next_state[consumable] -= rule['Consumes'][consumable]
+                next_state[consumable] += rule['Consumes'][consumable]
         if 'Produces' in rule:
             for product in rule['Produces']:
-                next_state[product] += rule['Produces'][product]
+                next_state[product] -= rule['Produces'][product]
         return next_state
 
     return effect
@@ -129,13 +129,13 @@ def search(graph, state, is_goal, limit, heuristic):
     
     while time() - start_time < limit:
         current_cost, current_state = heappop(queue)
-        if is_goal(current_state):
+        if current_state == state:
             #fill path with (state, action to that state) pairs
             while prev_pairs[current_state]:
                 prev_state, prev_action = prev_pairs[current_state]
                 path.append((current_state, prev_action))
                 current_state = prev_state
-            path.reverse()
+            #path.reverse()
             return path
         #act_ is short for action, as graph(state) generates possible actions
         for act_name, act_state, act_cost in graph(current_state):
