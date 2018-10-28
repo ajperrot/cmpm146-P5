@@ -1,7 +1,9 @@
 import json
 from collections import namedtuple, defaultdict, OrderedDict
 from timeit import default_timer as time
+#added those seen below
 from math import inf
+from heapq import heappop, heappush
 
 Recipe = namedtuple('Recipe', ['name', 'check', 'effect', 'cost'])
 
@@ -42,12 +44,14 @@ def make_checker(rule):
     def check(state):
         # This code is called by graph(state) and runs millions of times.
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
-        for requirement in rule['Requires']:
-            if not state[requirement]:
-                return False
-        for consumable in rule['Consumes']:
-            if not state[consumable] == rule['Consumes'][consumable]:
-                return False
+        if 'Requires' in rule:
+            for requirement in rule['Requires']:
+                if not state[requirement]:
+                    return False
+        if 'Consumes' in rule:
+            for consumable in rule['Consumes']:
+                if not state[consumable] >= rule['Consumes'][consumable]:
+                    return False
         return True
 
     return check
@@ -61,11 +65,13 @@ def make_effector(rule):
     def effect(state):
         # This code is called by graph(state) and runs millions of times
         # Tip: Do something with rule['Produces'] and rule['Consumes'].
-        for consumable in rule['Consumes']:
-            state[consumable] -= rule['Consumes'][consumable]
-        for product in rule['produces']:
-            state[product] += rule['produces'][product]
-        next_state = state
+        next_state = state.copy()
+        if 'Consumes' in rule:
+            for consumable in rule['Consumes']:
+                next_state[consumable] -= rule['Consumes'][consumable]
+        if 'Produces' in rule:
+            for product in rule['Produces']:
+                next_state[product] += rule['Produces'][product]
         return next_state
 
     return effect
@@ -78,7 +84,7 @@ def make_goal_checker(goal):
     def is_goal(state):
         # This code is used in the search process and may be called millions of times.
         for condition in goal:
-            if not state[condition] == goal[condition]:
+            if not state[condition] >= goal[condition]:
                 return False
         return True
 
@@ -96,6 +102,10 @@ def graph(state):
 
 def heuristic(state):
     # Implement your heuristic here!
+    if state['iron_axe'] > 1 or state['iron_pickaxe'] > 1 or state['stone_axe'] > 1 or state['stone_pickaxe'] > 1 or state['wooden_axe'] > 1 or state['wooden_pickaxe'] > 1:
+    #avoid making unnecessary tools
+    #this was just the example given in the assignement
+        return inf
     return 0
 
 def search(graph, state, is_goal, limit, heuristic):
@@ -106,32 +116,56 @@ def search(graph, state, is_goal, limit, heuristic):
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
-
-    path = []
-
     while time() - start_time < limit:
-        pass
+        #normal A* structures
+        path = []
+        queue = [(0, state)]
+        #pair: (previous state, action taken from that state)
+        prev_pairs = {}
+        prev_pairs[state] = None
+        #total recipe time + number of steps
+        costs = {}
+        costs[state] = 0
+
+        current_cost, current_state = heappop(queue)
+        if is_goal(current_state):
+            #fill path with (state, action to that state) pairs
+            while prev_pairs[current_state]:
+                prev_state, prev_action = prev_pairs[current_state]
+                path.append((current_state, prev_action))
+                current_state = prev_state
+            path.reverse()
+            return path
+        #act_ is short for action, as graph(state) generates possible actions
+        for act_name, act_state, act_cost in graph(current_state):
+            # the +1 is a len counter (number of steps)
+            pathcost = current_cost + act_cost + 1
+            if act_state not in costs or pathcost < costs[act_state]:
+                costs[act_state] = pathcost
+                prev_pairs[act_state] = (current_state, (act_name, act_state, act_cost))
+                heappush(queue, (heuristic(act_state) + pathcost, act_state))
 
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
-    return path
+    print("final state = ", current_state)#test
+    return None
 
 if __name__ == '__main__':
     with open('Crafting.json') as f:
         Crafting = json.load(f)
 
     # # List of items that can be in your inventory:
-    # print('All items:', Crafting['Items'])
+    #print('All items:', Crafting['Items'])
     #
     # # List of items in your initial inventory with amounts:
-    # print('Initial inventory:', Crafting['Initial'])
+    print('Initial inventory:', Crafting['Initial'])
     #
     # # List of items needed to be in your inventory at the end of the plan:
-    # print('Goal:',Crafting['Goal'])
+    print('Goal:',Crafting['Goal'])
     #
     # # Dict of crafting recipes (each is a dict):
-    # print('Example recipe:','craft stone_pickaxe at bench ->',Crafting['Recipes']['craft stone_pickaxe at bench'])
+    #print('Example recipe:','craft stone_pickaxe at bench ->',Crafting['Recipes']['craft stone_pickaxe at bench'])
 
     # Build rules
     all_recipes = []
