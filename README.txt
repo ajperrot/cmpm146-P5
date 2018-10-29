@@ -13,7 +13,8 @@ of the given test cases in the grading criteria section.
 The definition of an unnecessary quantity is as follows:
 max = (max consumed in a rule - 1) + (min ammount produced in a rule)
 
-We also banned axes, as they were not included in any optimal solution
+We also banned axes (i.e. gave +inf heuristic to states with axes),
+as they were not included in any optimal solution
 to the grading criteria problems. We could've gotten under to 30 second
 mark allowing non-iron axes (iron is no better than stone), but because
 the heuristic is already tailored to the idea that we're NOT making
