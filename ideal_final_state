@@ -1,6 +1,0 @@
-State([('bench', 1), ('cart', 1), ('coal', 0), ('cobble', 0), ('furnace', 1), ('ingot', 0), ('iron_axe', 0), ('iron_pickaxe', 1), ('ore', 0), ('plank', 1), ('rail', 32), ('stick', 0), ('stone_axe', 0), ('stone_pickaxe', 1), ('wood', 0), ('wooden_axe', 0), ('wooden_pickaxe', 1)]), 1)
-is the ideal end state for the hardest challenge.
-it features no axes. They are a trap.
-
-NOTICE in the .json that iron axes are NOYT faster
-this is a trap. iron axes need to be banned

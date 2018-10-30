@@ -5,6 +5,10 @@ from timeit import default_timer as time
 from math import inf
 from heapq import heappop, heappush
 
+
+#Partner was ALex Perrotti
+
+
 Recipe = namedtuple('Recipe', ['name', 'check', 'effect', 'cost'])
 
 
@@ -102,7 +106,7 @@ def graph(state):
 
 def heuristic(state):
     # Implement your heuristic here!
-    if state['wood'] > 1 or state['plank'] > 7 or state['stick'] > 5 or state['bench'] > 1 or state['wooden_axe'] > 0 or state['wooden_pickaxe'] > 1 or state['cobble'] > 8 or state['coal'] > 1 or state['stone_axe'] > 0 or state['stone_pickaxe'] > 1 or state['ore'] > 1 or state['furnace'] > 1 or state['ingot'] > 6 or state['iron_axe'] > 0 or state['iron_pickaxe'] > 1:  
+    if state['wood'] > 1 or state['plank'] > 7 or state['stick'] > 5 or state['bench'] > 1 or state['wooden_axe'] > 0 or state['wooden_pickaxe'] > 1 or state['cobble'] > 8 or state['coal'] > 1 or state['stone_axe'] > 0 or state['stone_pickaxe'] > 1 or state['ore'] > 1 or state['furnace'] > 1 or state['ingot'] > 6 or state['iron_axe'] > 0 or state['iron_pickaxe'] > 1:
         #avoid having more than you'll ever need of something
         #conditional is ordered by likelyhood as to check faster
         return inf
@@ -129,7 +133,7 @@ def search(graph, state, is_goal, limit, heuristic):
     #total number of steps
     steps = {}
     steps[state] = 0
-    
+
     while time() - start_time < limit:
         current_cost, current_state = heappop(queue)
         if is_goal(current_state):
@@ -162,7 +166,7 @@ def search(graph, state, is_goal, limit, heuristic):
     return None
 
 if __name__ == '__main__':
-    with open('Crafting.json') as f:
+    with open('crafting.json') as f:
         Crafting = json.load(f)
 
     # # List of items that can be in your inventory:
